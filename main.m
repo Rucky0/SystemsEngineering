@@ -8,8 +8,8 @@ h=0.001; % Discretization step
 
 % Question 2 should be answered in the report, and submitted below
 Q = @(n1, n2)[-(lambda1+lambda2), lambda2, lambda1, 0; ...
-       n2* mu2, -(lambda2+n2*mu2), 0, lambda1; ...
-       n1 * mu1, 0, -(n1*mu1+lambda2), lambda2; ...
+       3* mu2, -(lambda2+3*mu2), 0, lambda1; ...
+       3 * mu1, 0, -(3*mu1+lambda2), lambda2; ...
        0, n1*mu1, n2*mu2, -(n1*mu1+n2*mu2)];
 
 Qi = Q(3,0);
@@ -47,6 +47,13 @@ AV= [AVi AVii AViii AViv];
 
 %% CONTINUOUS TIME SIMULATION
 % Question 6a should be answered in the report
+% When starting at state V, we take 2 random samples from each exponential
+% distribution and go to the state depending of the engine that failed
+% first. When at the new engine, we again take 2 samples from the opposing
+% engine failing and us fixing the broken engine. Because of the
+% memory-less attribute of the exponational distribution, it makes sense to
+% resample (restart) from the opposite engine breaking. If both engine fail, 
+% and the technicians are working on engine 2, they will be reallocated to engine 1.
 
 % Question 7a should be answered in the report, describe how you do it, and check that the result agrees with the analytic result
 
