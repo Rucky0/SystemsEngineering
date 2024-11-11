@@ -59,15 +59,23 @@ AV= [AVi AVii AViii AViv];
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
 
-AVtTF = "to do"   % This will be the answer to the new question, I will describe it in the pdf.
+AVtTF = 0.316136753867189;   % This will be the answer to the new question, I will describe it in the pdf.
 % Describe in the report how you do this. 
 
 %% DISCRETE TIME SIMULATION
 % Question 6b should be answered in the report, describe how you determine the transition matrix and enter below
 
-P = "to do"
+P = expm(Qi*h);
+P1 = eye(4) + h*Qi;
 
 % Question 7b should be answered in the report, describe how you do it, and check that the result agrees with the analytic result
+N = 1e5;
+
+state = [1,0,0,0];
+
+state = state*P^N;
+
+
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
 
