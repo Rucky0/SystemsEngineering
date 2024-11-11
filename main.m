@@ -1,6 +1,6 @@
 birthdate = 20010930;   % Write the birth date on format yyyymmdd for oldest member
 format compact
-[lambda1,lambda2,mu1,mu2,V1,V2,V] = getFerrydata(birthdate);  % Do not clear or redefine these variables.
+[lambda1,lambda2,mu1,mu2,V1,V2,V] = [15,9,15,19,10,14,21]% getFerrydata(birthdate);  % Do not clear or redefine these variables.
 h=0.001; % Discretization step
 
 %% ANALYTIC SOLUTION
