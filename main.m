@@ -105,24 +105,44 @@ P1 = eye(4) + h*Qi;
 
 % Question 7b should be answered in the report, describe how you do it, and check that the result agrees with the analytic result
 
-% 
-% states = zeros(2,4);
-% N = 1e3;
-% for i = 1:N
-%     states = [1,0,0,0];
-%     state = 1;
-% 
-% 
-% end
 
-for i=1:2
-    N = 10^(3+i);
-    state = [1,0,0,0];
-    state = state*P^N;
-    states(i,:) = state;
+states = zeros(2,4);
+
+s = [1,0,0,0];
+state = 1;
+
+
+for k = 1:2
+    N = 10^(5+k);
+
+    for i = 1:N
+        transition_probabilities = P(state,:);
+        cumulative_probs = cumsum(transition_probabilities);
+        sample = rand;
+    
+        for j = 1:length(cumulative_probs)
+            if sample <= cumulative_probs(j)
+                state = j;
+                break;
+            end
+        end
+
+        states(k,state) = states(k,state) + 1;
+    end
+
+    states(k,:) = states(k,:)/N;
 end
-
 error = norm(states(1,:)-states(2,:));
+
+% Analytic
+% for i=1:2
+%     N = 10^(3+i);
+%     state = [1,0,0,0];
+%     state = state*P^N;
+%     states(i,:) = state;
+% end
+% 
+% error = norm(states(1,:)-states(2,:));
 
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
@@ -131,7 +151,7 @@ average_speed = state*[V; V1; V2; 0];
 
 %%
 % Question 9a should be answered in the report, describe how you do it, do the calculations and enter results below
-
+P
 state = [1,0,0,0];
 
 state10 = state*P^10;
@@ -153,10 +173,37 @@ ETtTF = my(1);
 % Some of the following commands may be useful for the implementation when repeating steps over and over
 % for, while, switch, break
 
-for i = 1:N
-    
-end
 
+%% sim for 9b
+clc
+average_steps_untill_failure = 0;
+steps = 0;
+state = 1;
+resets = 0;
+
+for i = 1:N
+    transition_probabilities = P(state,:);
+    cumulative_probs = cumsum(transition_probabilities);
+    sample = rand;
+
+    for j = 1:length(cumulative_probs)
+        if sample <= cumulative_probs(j)
+            state = j;
+            break;
+        end
+    end
+    steps = steps + 1;
+
+    if state == 4
+        state = 1;
+        average_steps_untill_failure = average_steps_untill_failure + steps;
+        steps = 0;
+        resets = resets + 1;
+    end
+end
+disp("average time untill total failure is " +average_steps_untill_failure/resets)
+
+%% funcitons
 function pi = stationary_states(Q)
     
     b = [zeros(4,1);1];
