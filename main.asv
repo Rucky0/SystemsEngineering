@@ -62,40 +62,8 @@ AV= [AVi AVii AViii AViv];
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
 
-T = 1e3;
-t = 0;
-state = 1;
-
-state_params = 1./Qi;
-
-avg_times = zeros(2,4);
-
-% Question 7a should be answered in the report, describe how you do it, and check that the result agrees with the analytic result
-for i = 1:2
-    state_time = zeros(1,4);
-    while sum(state_time)<T
-        [state, state_time] = update_state(state, state_time, state_params);
-    end
-    avg_times(i,:) = state_time./T;
-end
-
-error = norm(avg_times(1,:)-avg_times(2,:));
-
-% Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
-state_time = zeros(1, 4);
-M = 1e4;
-for i=1:M
-    state = 1;
-    while state ~= 4
-        [state, state_time] = update_state(state, state_time, state_params);
-    end
-end
-total_time_before_failure = sum(state_time);
-
-AVtTF = total_time_before_failure/M;   
-% This will be the answer to the new question, I will describe it in the pdf.
+AVtTF = 0.316136753867189;   % This will be the answer to the new question, I will describe it in the pdf.
 % Describe in the report how you do this. 
-
 
 %% DISCRETE TIME SIMULATION
 % Question 6b should be answered in the report, describe how you determine the transition matrix and enter below
@@ -104,58 +72,31 @@ P = expm(Qi*h);
 P1 = eye(4) + h*Qi;
 
 % Question 7b should be answered in the report, describe how you do it, and check that the result agrees with the analytic result
+N = 1e4;
 
-% 
-% states = zeros(2,4);
-% N = 1e3;
-% for i = 1:N
-%     states = [1,0,0,0];
-%     state = 1;
-% 
-% 
-% end
+state = [1,0,0,0];
+states = zeros(2,4);
 
 for i=1:2
-    N = 10^(3+i);
     state = [1,0,0,0];
     state = state*P^N;
-    states(i,:) = state;
+    states(i) = 
 end
 
-error = norm(states(1,:)-states(2,:));
 
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
 
-average_speed = state*[V; V1; V2; 0];
 
-%%
 % Question 9a should be answered in the report, describe how you do it, do the calculations and enter results below
 
-state = [1,0,0,0];
+Probfail10 = "to do";
 
-state10 = state*P^10;
+ETtTF = "to do";
 
-P10 = expm(10*Qi);
 
-Probfail10 = state10(4);
-
-Ptime = expm(Qi);
-
-A = [0, P(1,3), P(1,2); 
-    P(3,1), 0, 0;
-    P(2,1), 0, 0];
-A = (eye(3) - A);
-b = [1,1,1]';
-my = A\b;
-
-ETtTF = my(1);
 % Some of the following commands may be useful for the implementation when repeating steps over and over
-% for, while, switch, break
-
-for i = 1:N
-    
-end
+% for, while, switch, break     
 
 function pi = stationary_states(Q)
     
@@ -164,45 +105,4 @@ function pi = stationary_states(Q)
     pi  = A\b;
     pi = pi';
 
-end
-
-function [state, state_time] = update_state(state, state_time, state_params)
-    params = state_params(state, :);
-    params = params(params > 0 & isfinite(params));
-
-    if state == 1
-        to = [exprnd(params(1)); exprnd(params(2))];
-        [time, min_arg] = min(to);
-        state_time(state) = state_time(state) + time;
-        if min_arg == 1
-            state = 2;
-        else
-            state = 3;
-        end
-
-    elseif state == 2
-        to = [exprnd(params(1)); exprnd(params(2))];
-        [time, min_arg] = min(to);
-        state_time(state) = state_time(state) + time;
-        if min_arg == 1
-            state = 1;
-        else
-            state = 4;
-        end
-
-    elseif state == 3
-        to = [exprnd(params(1)); exprnd(params(2))];
-        [time, min_arg] = min(to);
-        state_time(state) = state_time(state) + time;
-        if min_arg == 1
-            state = 1;
-        else
-            state = 4;
-        end
-
-    else
-        to = exprnd(params);
-        state_time(state) = state_time(state) + to;
-        state = 2;
-    end
 end

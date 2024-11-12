@@ -1,3 +1,6 @@
+clc
+clear all
+
 birthdate = 20010930;   % Write the birth date on format yyyymmdd for oldest member
 format compact
 [lambda1,lambda2,mu1,mu2,V1,V2,V] = deal(15,9,15,19,10,14,21);%getFerrydata(birthdate);  % Do not clear or redefine these variables.
@@ -8,7 +11,7 @@ t = 0;
 state = 1;
 
 Q = @(n1, n2)[-(lambda1+lambda2), lambda2, lambda1, 0; ...
-       3* mu2, -(lambda2+3*mu2), 0, lambda1; ...
+       3* mu2, -(lambda1+3*mu2), 0, lambda1; ...
        3 * mu1, 0, -(3*mu1+lambda2), lambda2; ...
        0, n1*mu1, n2*mu2, -(n1*mu1+n2*mu2)];
 
