@@ -151,7 +151,6 @@ average_speed = state*[V; V1; V2; 0];
 
 %%
 % Question 9a should be answered in the report, describe how you do it, do the calculations and enter results below
-P
 state = [1,0,0,0];
 
 state10 = state*P^10;
@@ -162,9 +161,9 @@ Probfail10 = state10(4);
 
 Ptime = expm(Qi);
 
-A = [0, P(1,3), P(1,2); 
-    P(3,1), 0, 0;
-    P(2,1), 0, 0];
+A = [P(1,1), P(1,2), P(1,3); 
+    P(2,1), P(2,2), 0;
+    P(3,1), 0, P(3,3)];
 A = (eye(3) - A);
 b = [1,1,1]';
 my = A\b;

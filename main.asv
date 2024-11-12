@@ -151,7 +151,7 @@ average_speed = state*[V; V1; V2; 0];
 
 %%
 % Question 9a should be answered in the report, describe how you do it, do the calculations and enter results below
-
+P
 state = [1,0,0,0];
 
 state10 = state*P^10;
@@ -162,7 +162,7 @@ Probfail10 = state10(4);
 
 Ptime = expm(Qi);
 
-A = [0, P(1,3), P(1,2); 
+A = [P, P(1,3), P(1,2); 
     P(3,1), 0, 0;
     P(2,1), 0, 0];
 A = (eye(3) - A);
@@ -174,7 +174,7 @@ ETtTF = my(1);
 % for, while, switch, break
 
 
-%%  sim for 9b
+%% sim for 9b
 clc
 average_steps_untill_failure = 0;
 steps = 0;
