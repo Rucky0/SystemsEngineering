@@ -79,11 +79,11 @@ for i = 1:2
     avg_times(i,:) = state_time./T;
 end
 
-error = norm(avg_times(1,:)-avg_times(2,:));
+error_7a = norm(avg_times(1,:)-avg_times(2,:));
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
 state_time = zeros(1, 4);
-M = 1e4;
+M = 1e5;
 for i=1:M
     state = 1;
     while state ~= 4
@@ -113,7 +113,7 @@ state = 1;
 
 
 for k = 1:2
-    N = 10^(5+k);
+    N = 10^(7);
 
     for i = 1:N
         transition_probabilities = P(state,:);
@@ -132,17 +132,7 @@ for k = 1:2
 
     states(k,:) = states(k,:)/N;
 end
-error = norm(states(1,:)-states(2,:));
-
-% Analytic
-% for i=1:2
-%     N = 10^(3+i);
-%     state = [1,0,0,0];
-%     state = state*P^N;
-%     states(i,:) = state;
-% end
-% 
-% error = norm(states(1,:)-states(2,:));
+error_7b = norm(states(1,:)-states(2,:));
 
 
 % Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
@@ -161,9 +151,17 @@ Probfail10 = state10(4);
 
 Ptime = expm(Qi);
 
+%sib testa:
+%A = [P(1,1), P(1,2), P(1,3); 
+%    P(2,1), P(2,2), P(2,3);
+%    P(3,1), P(3,2), P(3,3)];
+%A = [P(1,1), P(1,2), P(1,3); 
+%    P(2,1), P(2,2), 0;
+%    P(3,1), 0, P(3,3)];
+
 A = [P(1,1), P(1,2), P(1,3); 
-    P(2,1), P(2,2), 0;
-    P(3,1), 0, P(3,3)];
+   P(2,1), P(2,2), P(2,3);
+   P(3,1), P(3,2), P(3,3)];
 A = (eye(3) - A);
 b = [1,1,1]';
 my = A\b;
@@ -200,7 +198,6 @@ for i = 1:N
         resets = resets + 1;
     end
 end
-disp("average time untill total failure is " +average_steps_untill_failure/resets)
 
 %% funcitons
 function pi = stationary_states(Q)
