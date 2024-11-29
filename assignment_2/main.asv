@@ -1,7 +1,7 @@
 %% First we generate input data
-birthdate =  20010930  % Write the birth date on format yyyymmdd for oldest member in the group
+birthdate =  20010930;  % Write the birth date on format yyyymmdd for oldest member in the group
 format compact
-[lambdavec,Tvec,cvec] = deal([0.0531,0.0430,0.0474,0.0554,0.0269,0.0503,0.0672,0.0352,0.0170],[6,9,15,29,14,21,39,9,12],[13,15,22,22,11,54,83,35,24])%getSPOdata(birthdate)   %yyyymmdd  Do not use clear command or change the values of these variables
+[lambdavec,Tvec,cvec] = deal([0.0531,0.0430,0.0474,0.0554,0.0269,0.0503,0.0672,0.0352,0.0170],[6,9,15,29,14,21,39,9,12],[13,15,22,22,11,54,83,35,24]); %getSPOdata(birthdate)   %yyyymmdd  Do not use clear command or change the values of these variables
 
 % -------------------------------------------------------------------------------------------------------------------
 %% Marginal Allocation
@@ -11,17 +11,47 @@ format compact
 % Enter on the format EBO2 = [EBO_1(2) EBO_2(2) ... EBO_9(2)]      
 % EBO_j(2) should be the EBO for two spares of LRU2
 % Cost2 should be the total cost for the allocation of spares (scalar) 
-k = 0
-probabilities = arrayfun(@(l) (l^k * exp(-l)) / factorial(k), lambdavec);
 
-EBO2 = "to do"
-Cost2 = sum(cvec*2)
+EBO2 = lambdavec.*Tvec - R_vec(lambdavec,Tvec,zeros(1,9)) - R_vec(lambdavec,Tvec,ones(1,9));
+Cost2 = sum(cvec*2);
 
 Q2 = [EBO2 Cost2]; % Checking both at the same time in grader.
 
 % Question 3, you should describe how the Marginal allocation is
 % implemented in your own words in the report, and compute all efficient
 % points.
+
+s = zeros(9);
+
+%%
+s_vec = zeros(1,9);
+s_mat = zeros(1,9);
+EBOs_mat = lambdavec.*Tvec;
+EBOs_vec = [sum(lambdavec.*Tvec)];
+counter = 1;
+
+while dot(cvec,s_vec) < 500
+    counter = counter+1;
+    disp(EBOs(counter-1,:))
+    
+    quot = R_vec(lambdavec,Tvec,s_vec)./cvec;
+    [maxVal, argMax] = max(quot);
+    s_vec(argMax) = s_vec(argMax)+1;
+
+    if dot(cvec,s_vec) > 500
+        s_vec(argMax) = s_vec(argMax)-1;
+        break
+    end
+    increase_s = zeros(1,9)
+    increase_s(argMax) = s_vec(a)
+
+    EBOs_mat(counter,argMax) = EBOs_mat(counter-1,argMax)-R_vec(lambdavec,Tvec,s_vec(argMax));
+    EBOs_vec(counter) = sum(EBOs_vec(counter-1) - R_vec(lambdavec,Tvec,s_vec));
+
+    s_mat = [s_mat;s_vec];
+end
+plot(EBOs_vec)
+
 
 % Question 4 should be answered in the report, with a figure and a table with
 % all efficient points
@@ -66,8 +96,17 @@ DynPtable = "to do"
 % Question 10 should be answered in the report, and submitted below
 NumberOfConfigurations = "to do"
 
+%% functions
 
+function r_vec = R_vec(lambdavec,Tvec,s_vec)
+    l = lambdavec.*Tvec;
 
-
-
+    prob_sum = zeros(1,9);
+    for j =1:9
+        for i = 0:s_vec(j)
+            prob_sum(j) = prob_sum(j) + (l(j).^i).*exp(-l(j))/factorial(i);
+        end
+    end
+    r_vec = 1 - prob_sum;
+end
 
