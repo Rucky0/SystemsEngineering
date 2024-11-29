@@ -135,12 +135,12 @@ end
 error_7b = norm(states(1,:)-states(2,:));
 
 
-% Question 8a should be answered in the report, describe how you do it, do the calculations and enter results below
+% Question 8b should be answered in the report, describe how you do it, do the calculations and enter results below
 
 average_speed = state*[V; V1; V2; 0];
 
 %%
-% Question 9a should be answered in the report, describe how you do it, do the calculations and enter results below
+% Question 9b should be answered in the report, describe how you do it, do the calculations and enter results below
 state = [1,0,0,0];
 
 state10 = state*P^10;
@@ -152,16 +152,11 @@ Probfail10 = state10(4);
 Ptime = expm(Qi);
 
 %sib testa:
-%A = [P(1,1), P(1,2), P(1,3); 
-%    P(2,1), P(2,2), P(2,3);
-%    P(3,1), P(3,2), P(3,3)];
-%A = [P(1,1), P(1,2), P(1,3); 
+A = P1(1:3,1:3);
+
+% A = [P(1,1), P(1,2), P(1,3); 
 %    P(2,1), P(2,2), 0;
 %    P(3,1), 0, P(3,3)];
-
-A = [P(1,1), P(1,2), P(1,3); 
-   P(2,1), P(2,2), 0;
-   P(3,1), 0, P(3,3)];
 A = (eye(3) - A);
 b = [1,1,1]';
 my = A\b;
@@ -169,35 +164,6 @@ my = A\b;
 ETtTF = my(1);
 % Some of the following commands may be useful for the implementation when repeating steps over and over
 % for, while, switch, break
-
-
-%% sim for 9b
-clc
-average_steps_untill_failure = 0;
-steps = 0;
-state = 1;
-resets = 0;
-
-for i = 1:N
-    transition_probabilities = P(state,:);
-    cumulative_probs = cumsum(transition_probabilities);
-    sample = rand;
-
-    for j = 1:length(cumulative_probs)
-        if sample <= cumulative_probs(j)
-            state = j;
-            break;
-        end
-    end
-    steps = steps + 1;
-
-    if state == 4
-        state = 1;
-        average_steps_untill_failure = average_steps_untill_failure + steps;
-        steps = 0;
-        resets = resets + 1;
-    end
-end
 
 %% funcitons
 function pi = stationary_states(Q)
