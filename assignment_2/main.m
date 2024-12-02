@@ -88,6 +88,13 @@ final_EBOs=[final_EBO_q2,final_EBO_q3;
 
 % Question 7 should be answered in the report, and submitted below
 % as a row vector with numbers of LRU1 used for budget 0 to 50.
+LRU1=[0];
+for c_budget = 1:50
+    s = 0;
+    [value,s_vec] = value_funciton(s,c_budget,cvec(1));
+    LRU1(c_budget+1) = s_vec;
+end
+
 LRU1 = "to do"
 
 % Question 8 should be answered in the report, and submitted below
@@ -116,3 +123,24 @@ function r_vec = R_vec(lambdavec,Tvec,s_vec)
     r_vec = 1 - prob_sum;
 end
 
+% function ebo = EBO(s, time_vec, lambda_vec)
+%     if s == 0
+%         ebo = time_vec.*lambda_vec;
+%         return
+%     end
+% 
+%     ebo = EBO(s-1, time_vec, lambda_vec) - R_vec(lambda_vec, time_vec, s-1);
+% end
+% 
+% function [value, s_vec] = value_funciton(s, budget,cost_vec)
+%     cost = dot(s,cost_vec);
+% 
+%     if cost > budget
+%         s_vec = s-1;
+%         value = 0; %sketcky
+%         return
+%     end
+%     [value_next, s_vec] = value_funciton(s+1, budget, cost_vec);
+%     value = EBO(s+1, 6, 0.0531) - EBO(s,6, 0.0531) + value_next;
+% 
+% end
