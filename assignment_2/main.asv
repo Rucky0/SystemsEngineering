@@ -88,18 +88,36 @@ final_EBOs=[final_EBO_q2,final_EBO_q3;
 
 % Question 7 should be answered in the report, and submitted below
 % as a row vector with numbers of LRU1 used for budget 0 to 50.
-s=[0];
-c_budget = 50;
-f = 0;
-
-value_funciton(s,c_budget,)
-LRU1 = "to do"
+LRU1=[0];
+counter = 1;
+val_vec = [0];
+for budget = 1:50
+    s = 0;
+    [val_vec(counter+1), s_vec] = Recursion(lambdavec,Tvec,s,budget,cvec(1),argMax);
+    LRU1(counter+1) = s_vec;
+    counter = counter + 1;
+end
+%%
 
 % Question 8 should be answered in the report, and submitted below
 % Enter on the format DynPtable = [ x0 EBO(x0) C(x0); x1 EB0(x1) C(x1); ... x4 EBO(x4) C(x4)]
 % Where x0 to x4 are the row vectors with number of spare parts of each kind
 % corresponding to the points optimal for budgets 0,100,150, 350, 500.
-DynPtable = "to do"
+LRU=zeros(1,9);
+counter = 1;
+val_vec = [0];
+for budget = 1:500
+    s = zeros(1,9);
+    [val_vec(counter+1), LRU(counter+1,:)] = Recursion(lambdavec,Tvec,s,budget,cvec,argMax);
+    counter = counter + 1;
+end
+plot(val_vec)
+
+for i = [0,100,150, 350, 500]
+
+end
+DynPtable = [LRU(1,:), val_vec(1), c5];
+
 
 % Question 9 should be answered in the report
 
@@ -121,15 +139,26 @@ function r_vec = R_vec(lambdavec,Tvec,s_vec)
     r_vec = 1 - prob_sum;
 end
 
-function [value, s_vec] = value_funciton(s, budget,cost_vec)
-    cost = dot(s,cost_vec);
+function [value, s_vec] = Recursion(lambdavec,Tvec,s_vec,budget,cvec,argMax)
+    cost = dot(s_vec ,cvec);
     
-    if cost >= budget
-        s_vec = s;
-        value = 0;
+    if cost > budget
+        s_vec(argMax) = s_vec(argMax)-1;
+        value = -1;
         return
     end
-    [value, s_vec] = alue_funciton(s+1, budget, cost_vec);
-    value = EBO(s+1) - EBO(s) + value;
+
+    r_vec = R_vec(lambdavec, Tvec, s_vec);
+
+    [value, argMax] = max(r_vec);
     
+    s_vec(argMax) = s_vec(argMax) + 1;
+    
+    [value_next, s_vec] = Recursion(lambdavec,Tvec, s_vec, budget, cvec, argMax);
+    
+    if value_next < 0
+        value_next = -value;
+    end
+
+    value = value + value_next;
 end

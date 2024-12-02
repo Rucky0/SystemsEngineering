@@ -89,24 +89,42 @@ final_EBOs=[final_EBO_q2,final_EBO_q3;
 % Question 7 should be answered in the report, and submitted below
 % as a row vector with numbers of LRU1 used for budget 0 to 50.
 LRU1=[0];
-for c_budget = 1:50
+counter = 1;
+val_vec = [0];
+for budget = 1:50
     s = 0;
-    [value,s_vec] = value_funciton(s,c_budget,cvec(1));
-    LRU1(c_budget+1) = s_vec;
+    [val_vec(counter+1), s_vec] = Recursion(lambdavec,Tvec,s,budget,cvec(1),argMax);
+    LRU1(counter+1) = s_vec;
+    counter = counter + 1;
 end
-
-LRU1 = "to do"
+%%
 
 % Question 8 should be answered in the report, and submitted below
 % Enter on the format DynPtable = [ x0 EBO(x0) C(x0); x1 EB0(x1) C(x1); ... x4 EBO(x4) C(x4)]
 % Where x0 to x4 are the row vectors with number of spare parts of each kind
 % corresponding to the points optimal for budgets 0,100,150, 350, 500.
-DynPtable = "to do"
+LRU=zeros(1,9);
+counter = 1;
+val_vec = [0];
+for budget = 1:500
+    s = zeros(1,9);
+    [val_vec(counter+1), LRU(counter+1,:)] = Recursion(lambdavec,Tvec,s,budget,cvec,argMax);
+    counter = counter + 1;
+end
+plot(val_vec)
+
+DynPtable = zeros(1,11);
+counter = 1;
+for i = [1,101,151, 351, 501]
+    DynPtable(counter,:) = [LRU(i,:), sum(lambdavec.*Tvec)-val_vec(i), LRU(i,:)*cvec'];
+    counter = counter + 1;
+end
+
 
 % Question 9 should be answered in the report
 
 % Question 10 should be answered in the report, and submitted below
-NumberOfConfigurations = 6^9;
+NumberOfConfigurations = 5^9;
 
 %% functions
 
@@ -123,24 +141,26 @@ function r_vec = R_vec(lambdavec,Tvec,s_vec)
     r_vec = 1 - prob_sum;
 end
 
-% function ebo = EBO(s, time_vec, lambda_vec)
-%     if s == 0
-%         ebo = time_vec.*lambda_vec;
-%         return
-%     end
-% 
-%     ebo = EBO(s-1, time_vec, lambda_vec) - R_vec(lambda_vec, time_vec, s-1);
-% end
-% 
-% function [value, s_vec] = value_funciton(s, budget,cost_vec)
-%     cost = dot(s,cost_vec);
-% 
-%     if cost > budget
-%         s_vec = s-1;
-%         value = 0; %sketcky
-%         return
-%     end
-%     [value_next, s_vec] = value_funciton(s+1, budget, cost_vec);
-%     value = EBO(s+1, 6, 0.0531) - EBO(s,6, 0.0531) + value_next;
-% 
-% end
+function [value, s_vec] = Recursion(lambdavec,Tvec,s_vec,budget,cvec,argMax)
+    cost = dot(s_vec ,cvec);
+    
+    if cost > budget
+        s_vec(argMax) = s_vec(argMax)-1;
+        value = -1;
+        return
+    end
+
+    r_vec = R_vec(lambdavec, Tvec, s_vec);
+
+    [value, argMax] = max(r_vec);
+    
+    s_vec(argMax) = s_vec(argMax) + 1;
+    
+    [value_next, s_vec] = Recursion(lambdavec,Tvec, s_vec, budget, cvec, argMax);
+    
+    if value_next < 0
+        value_next = -value;
+    end
+
+    value = value + value_next;
+end
