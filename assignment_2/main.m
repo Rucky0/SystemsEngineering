@@ -93,10 +93,12 @@ counter = 1;
 val_vec = [0];
 for budget = 1:50
     s = 0;
-    [val_vec(counter+1), s_vec] = Recursion(lambdavec,Tvec,s,budget,cvec(1),argMax);
+    [val_vec(counter+1), s_vec] = Recursion_old(lambdavec,Tvec,s,budget,cvec(1),argMax);
     LRU1(counter+1) = s_vec;
     counter = counter + 1;
 end
+
+
 %%
 
 % Question 8 should be answered in the report, and submitted below
@@ -108,10 +110,23 @@ counter = 1;
 val_vec = [0];
 for budget = 1:500
     s = zeros(1,9);
-    [val_vec(counter+1), LRU(counter+1,:)] = Recursion(lambdavec,Tvec,s,budget,cvec,argMax);
+    [val_vec(counter+1), LRU(counter+1,:)] = Recursion_old(lambdavec,Tvec,s,budget,cvec,argMax);
     counter = counter + 1;
 end
 plot(val_vec)
+
+
+LRU=zeros(1,9);
+counter = 1;
+for budget = 1:500
+    weight_left = zeros(9,floor(budget/min(cvec)));
+    komp_amounts = zeros(9,floor(budget/min(cvec)));
+    values = zeros(9,floor(budget/min(cvec)));
+    
+    
+end
+
+
 
 DynPtable = zeros(1,11);
 counter = 1;
@@ -125,6 +140,7 @@ end
 
 % Question 10 should be answered in the report, and submitted below
 NumberOfConfigurations = 5^9;
+
 
 %% functions
 
@@ -141,7 +157,47 @@ function r_vec = R_vec(lambdavec,Tvec,s_vec)
     r_vec = 1 - prob_sum;
 end
 
-function [value, s_vec] = Recursion(lambdavec,Tvec,s_vec,budget,cvec,argMax)
+function [weight_left, values] = Recursion(budget, cvec, Tvec, lambdavec)
+    weight_left = zeros(9,floor(budget/min(cvec)));
+    values = zeros(9,floor(budget/min(cvec)));
+    
+    %intializing
+    for x_k = 0:floor(budget/cvec(9))
+        values(9,x_k+1) = EBO(x_k, Tvec, lambdavec);
+        weight_left(9,x_k+1) = budget-x_k*cvec(9);
+    end
+
+    %recursion for rest of components (loop backwards)
+    for i = 1:8
+        comp = 9-i;
+        
+        %get the optimal component amount depending on how much budget we have left
+        for s = weight_left(comp+1,:)
+            min_vec = zeros()
+
+            %computing the vector we want to minimize
+            for x_k = 0:floor(s/cvec(comp))
+                min_vec(x_k+1) = EBO(x_k,Tvec,lambdavec) + values(comp+1,floor((s-x_k*cvec(comp))/cvec(komp+1)));
+            end
+            [valMin, argMin] = min(min_vec);
+            
+        end
+        
+    end
+end
+
+function ebo = EBO(s, time_vec, lambda_vec)
+    if s == 0
+        ebo = time_vec.*lambda_vec;
+        return
+    end
+
+    ebo = EBO(s-1, time_vec, lambda_vec) - R_vec(lambda_vec, time_vec, s-1);
+end
+
+
+
+function [value, s_vec] = Recursion_old(lambdavec,Tvec,s_vec,budget,cvec,argMax)
     cost = dot(s_vec ,cvec);
     
     if cost > budget
@@ -156,7 +212,7 @@ function [value, s_vec] = Recursion(lambdavec,Tvec,s_vec,budget,cvec,argMax)
     
     s_vec(argMax) = s_vec(argMax) + 1;
     
-    [value_next, s_vec] = Recursion(lambdavec,Tvec, s_vec, budget, cvec, argMax);
+    [value_next, s_vec] = Recursion_old(lambdavec,Tvec, s_vec, budget, cvec, argMax);
     
     if value_next < 0
         value_next = -value;
