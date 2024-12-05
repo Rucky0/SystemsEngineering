@@ -5,32 +5,53 @@ clear, clc
 budget = 500;
 n = length(cvec);
 
-weight_left = zeros(n,floor(budget/min(cvec)));
-values = zeros(n,floor(budget/min(cvec)));
+values = zeros(n,budget);
+comp_bought = zeros(n,budget);
 
 %intializing
-for x_comp = 0:floor(budget/cvec(n))
-    all_ebos = EBO(x_comp, Tvec, lambdavec);
-    values(n,x_comp+1) = all_ebos(n);
-    weight_left(n,x_comp+1) = budget-x_comp*cvec(n);
+for bud = 0:budget
+    x_n = floor(bud/cvec(n));
+    values(n,bud+1) = EBO(x_n, Tvec(n), lambdavec(n));
+    comp_bought(n,bud+1) = x_n;
 end
+
+
+%%
 
 %recursion for rest of components (loop backwards)
 for i = 1:n-1
     comp = n-i;
+    disp(comp)
     
-    %computing the vector with all different function values to then look for minimums
-    all_values = zeros(1, floor(budget/cvec(comp)));
-    comp_ebo = lambdavec(comp)*Tvec(comp);
-    for x_comp = 0:floor(budget/cvec(comp))
-        all_values(x_comp+1) = comp_ebo + values(comp+1,floor(budget-x_comp*cvec(comp)/cvec(comp+1) te));
-        comp_ebo = comp_ebo - R_vec(lambdavec(comp),Tvec(comp),x_comp);
-    end
-    
-    break
+    %for every state s (resterande budget)
+    for bud = 0:budget
 
+        step_values = 99*ones(1,bud);
+        x_ks = zeros(1,bud);
+
+        for s = 0:bud
+            x_k = floor(s/cvec(comp));
+            step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, bud-x_k*cvec(comp)+1);
+        end
+
+        [minVal, minArg] = min(step_values);
+        
+        values(comp,bud+1) = minVal;
+        comp_bought(comp,bud+1) = floor((minArg-1)/cvec(comp));
+
+    end
+end
+%%
+optimal_buy = zeros(1,n);
+optimal_buy(1) = comp_bought(1,budget+1);
+budget_left = budget-optimal_buy(1)*cvec(1);
+
+for i = 2:n
+    optimal_buy(i) = comp_bought(i,budget_left+1);
+    budget_left = budget_left-optimal_buy(i)*cvec(i);
 end
 
+optimal_value = values(1,budget+1);
 
 function ebo = EBO(s, time_vec, lambda_vec)
     if s == 0
