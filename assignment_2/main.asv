@@ -88,16 +88,20 @@ final_EBOs=[final_EBO_q2,final_EBO_q3;
 
 % Question 7 should be answered in the report, and submitted below
 % as a row vector with numbers of LRU1 used for budget 0 to 50.
-LRU1=[0];
-counter = 1;
-val_vec = [0];
-for budget = 1:50
-    s = 0;
-    [val_vec(counter+1), s_vec] = Recursion_old(lambdavec,Tvec,s,budget,cvec(1),argMax);
-    LRU1(counter+1) = s_vec;
-    counter = counter + 1;
-end
 
+budget = 50;
+[LRU1, LRU1_EBO] = optimal_problem(budget, cvec(1), Tvec(1), lambdavec(1));
+
+fig1 = figure(2);
+plot(LRU1_EBO,'.-k','LineWidth',2,'MarkerSize',20)
+hold on   % Keeps old plots and adds new plots on top of the old
+hold off  % Replaces old plots with the new one
+grid on
+set(gca,'FontSize',20,'TickLabelInterpreter','latex')
+xlabel("Total Cost [-]",'FontSize',20,'interpreter','latex')
+ylabel("EBO [-]",'FontSize',20,'interpreter','latex')
+title('EBO for','FontSize',20,'interpreter','latex')
+print(fig1, '-dpdf', 'myfigure.pdf'); % save to the 'myfigure.pdf' file
 
 %%
 
@@ -123,7 +127,6 @@ for budget = 1:500
     komp_amounts = zeros(9,floor(budget/min(cvec)));
     values = zeros(9,floor(budget/min(cvec)));
     
-    weight_left
     
 end
 
@@ -158,33 +161,58 @@ function r_vec = R_vec(lambdavec,Tvec,s_vec)
     r_vec = 1 - prob_sum;
 end
 
-function [weight_left, values] = Recursion(budget, cvec, Tvec, lambdavec)
-    weight_left = zeros(9,floor(budget/min(cvec)));
-    values = zeros(9,floor(budget/min(cvec)));
+function [optimal_buy, optimal_values] = optimal_problem(budget, cvec, Tvec, lambdavec)
+        
+    n = length(cvec);
+    
+    values = zeros(n,budget);
+    comp_bought = zeros(n,budget);
     
     %intializing
-    for x_k = 0:floor(budget/cvec(9))
-        values(9,x_k+1) = EBO(x_k, Tvec, lambdavec);
-        weight_left(9,x_k+1) = budget-x_k*cvec(9);
+    for bud = 0:budget
+        x_n = floor(bud/cvec(n));
+        values(n,bud+1) = EBO(x_n, Tvec(n), lambdavec(n));
+        comp_bought(n,bud+1) = x_n;
     end
-
+    
+    
     %recursion for rest of components (loop backwards)
-    for i = 1:8
-        comp = 9-i;
+    for i = 1:n-1
+        comp = n-i;
+        disp(comp)
         
-        %get the optimal component amount depending on how much budget we have left
-        for s = weight_left(comp+1,:)
-            min_vec = zeros()
-
-            %computing the vector we want to minimize
-            for x_k = 0:floor(s/cvec(comp))
-                min_vec(x_k+1) = EBO(x_k,Tvec,lambdavec) + values(comp+1,floor((s-x_k*cvec(comp))/cvec(komp+1)));
+        %for every state s (resterande budget)
+        for bud = 0:budget
+    
+            step_values = 99*ones(1,bud);
+            x_ks = zeros(1,bud);
+    
+            for s = 0:bud
+                x_k = floor(s/cvec(comp));
+                step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, bud-x_k*cvec(comp)+1);
             end
-            [valMin, argMin] = min(min_vec);
-            values(komp,)
+    
+            [minVal, minArg] = min(step_values);
+            
+            values(comp,bud+1) = minVal;
+            comp_bought(comp,bud+1) = floor((minArg-1)/cvec(comp));
+    
         end
-        
     end
+    optimal_buy = zeros(n,budget+1);
+    optimal_values = zeros(1,budget+1);
+    
+    for j = 0:budget
+        optimal_buy(1,j+1) = comp_bought(1,j+1);
+        budget_left = j-optimal_buy(1,j+1)*cvec(1);
+    
+        for i = 2:n
+            optimal_buy(i,j+1) = comp_bought(i,budget_left+1);
+            budget_left = budget_left-optimal_buy(i,j+1)*cvec(i);
+        end
+        optimal_values(j+1) = values(1,j+1);
+    end 
+
 end
 
 function ebo = EBO(s, time_vec, lambda_vec)

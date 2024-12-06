@@ -42,16 +42,21 @@ for i = 1:n-1
     end
 end
 %%
-optimal_buy = zeros(1,n);
-optimal_buy(1) = comp_bought(1,budget+1);
-budget_left = budget-optimal_buy(1)*cvec(1);
+optimal_buy = zeros(n,budget+1);
+optimal_value = zeros(1,budget+1);
 
-for i = 2:n
-    optimal_buy(i) = comp_bought(i,budget_left+1);
-    budget_left = budget_left-optimal_buy(i)*cvec(i);
-end
+for j = 0:budget
+    optimal_buy(1,j+1) = comp_bought(1,j+1);
+    budget_left = j-optimal_buy(1,j+1)*cvec(1);
 
-optimal_value = values(1,budget+1);
+    for i = 2:n
+        optimal_buy(i,j+1) = comp_bought(i,budget_left+1);
+        budget_left = budget_left-optimal_buy(i,j+1)*cvec(i);
+    end
+    optimal_value(j+1) = values(1,j+1);
+end 
+
+%%
 
 function ebo = EBO(s, time_vec, lambda_vec)
     if s == 0

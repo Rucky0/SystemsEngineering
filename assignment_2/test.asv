@@ -31,7 +31,7 @@ for i = 1:n-1
 
         for s = 0:bud
             x_k = floor(s/cvec(comp));
-            step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, s-x_k*cvec(comp)+1);
+            step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, bud-x_k*cvec(comp)+1);
         end
 
         [minVal, minArg] = min(step_values);
@@ -41,9 +41,19 @@ for i = 1:n-1
 
     end
 end
-
+%%
 optimal_buy = zeros(1,n);
+optimal_buy(1) = comp_bought(1,budget+1);
+budget_left = budget-optimal_buy(1)*cvec(1);
 
+for j = 1:budget+1
+
+    for i = 2:n
+        optimal_buy(i) = comp_bought(i,budget_left+1);
+        budget_left = budget_left-optimal_buy(i)*cvec(i);
+    end
+end 
+optimal_value = values(1,budget+1);
 
 function ebo = EBO(s, time_vec, lambda_vec)
     if s == 0
