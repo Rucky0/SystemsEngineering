@@ -7,6 +7,7 @@ n = length(cvec);
 
 values = zeros(n,budget);
 comp_bought = zeros(n,budget);
+counter = 0;
 
 %intializing
 for bud = 0:budget
@@ -27,11 +28,16 @@ for i = 1:n-1
     for bud = 0:budget
 
         step_values = 99*ones(1,bud);
-        x_ks = zeros(1,bud);
+        x_k_old = -inf;
 
         for s = 0:bud
             x_k = floor(s/cvec(comp));
+            if x_k == x_k_old
+                continue
+            end
             step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, bud-x_k*cvec(comp)+1);
+            x_k_old = x_k;
+            counter = counter +1;
         end
 
         [minVal, minArg] = min(step_values);
@@ -41,6 +47,7 @@ for i = 1:n-1
 
     end
 end
+disp(counter)
 %%
 optimal_buy = zeros(n,budget+1);
 optimal_value = zeros(1,budget+1);

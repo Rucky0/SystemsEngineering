@@ -111,11 +111,13 @@ title('EBO for LRU1','FontSize',20,'interpreter','latex')
 budget = 500;
 [LRU, LRU_EBO] = optimal_problem(budget, cvec, Tvec, lambdavec);
 
-
+counter = 1;
 DynPtable = zeros(1,11);
 for i = [1,101,151, 351, 501]
     DynPtable(counter,:) = [LRU(:,i)', LRU_EBO(i), dot(LRU(:,i),cvec)];
+    counter = counter +1;
 end
+DynPtable
 
 fig3 = figure(3);
 plot(0:1:500,LRU_EBO,'.-k','LineWidth',2,'MarkerSize',5)
@@ -173,11 +175,15 @@ function [optimal_buy, optimal_values] = optimal_problem(budget, cvec, Tvec, lam
         for bud = 0:budget
     
             step_values = 99*ones(1,bud);
-            x_ks = zeros(1,bud);
-    
+            x_k_old = -inf;
+
             for s = 0:bud
                 x_k = floor(s/cvec(comp));
+                if x_k == x_k_old
+                    continue
+                end
                 step_values(s+1) = EBO(x_k,Tvec(comp),lambdavec(comp)) + values(comp+1, bud-x_k*cvec(comp)+1);
+                x_k_old = x_k;
             end
     
             [minVal, minArg] = min(step_values);
@@ -187,6 +193,7 @@ function [optimal_buy, optimal_values] = optimal_problem(budget, cvec, Tvec, lam
     
         end
     end
+
     optimal_buy = zeros(n,budget+1);
     optimal_values = zeros(1,budget+1);
     
